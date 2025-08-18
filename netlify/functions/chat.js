@@ -1,3 +1,5 @@
+import fetch from "node-fetch";
+
 export async function handler(event, context) {
   const body = JSON.parse(event.body);
   const userMessage = body.message;
@@ -7,8 +9,7 @@ export async function handler(event, context) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        // 🔴 Replace with your actual key
-        "Authorization": `Bearer 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`
+        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}` // ✅ Secret key stays in Netlify
       },
       body: JSON.stringify({
         model: "gpt-3.5-turbo",
