@@ -1,26 +1,14 @@
 export async function handler(event, context) {
+  const body = JSON.parse(event.body);
+  const userMessage = body.message;
+
   try {
-    let body = {};
-    if (event.body) {
-      body = JSON.parse(event.body);
-    }
-
-    const userMessage = body.message || "";
-
-    if (!userMessage) {
-      return {
-        statusCode: 200,
-        body: JSON.stringify({
-          reply: "👋 Hello! This is Moulik’s AI Portfolio Assistant. Please ask me something about Moulik’s projects, skills, or education."
-        })
-      };
-    }
-
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
+        // 🔴 Replace with your actual key
+        "Authorization": `Bearer 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`
       },
       body: JSON.stringify({
         model: "gpt-3.5-turbo",
@@ -37,13 +25,10 @@ export async function handler(event, context) {
     });
 
     const data = await response.json();
-    console.log("🔎 OpenAI Response:", JSON.stringify(data, null, 2)); // 👈 logs to Netlify
 
     return {
       statusCode: 200,
-      body: JSON.stringify({
-        reply: data.choices?.[0]?.message?.content || "⚠️ OpenAI returned no response."
-      })
+      body: JSON.stringify({ reply: data.choices[0].message.content })
     };
 
   } catch (error) {
