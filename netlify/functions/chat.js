@@ -1,6 +1,5 @@
 export async function handler(event, context) {
   try {
-    // 🛡️ Safe parse (avoid crash if no body is sent)
     let body = {};
     if (event.body) {
       body = JSON.parse(event.body);
@@ -8,7 +7,6 @@ export async function handler(event, context) {
 
     const userMessage = body.message || "";
 
-    // If no message is provided (like when opening URL directly)
     if (!userMessage) {
       return {
         statusCode: 200,
@@ -18,12 +16,11 @@ export async function handler(event, context) {
       };
     }
 
-    // 🔹 Call OpenAI API
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}` // ✅ stays hidden in Netlify
+        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
       },
       body: JSON.stringify({
         model: "gpt-3.5-turbo",
@@ -40,10 +37,13 @@ export async function handler(event, context) {
     });
 
     const data = await response.json();
+    console.log("🔎 OpenAI Response:", JSON.stringify(data, null, 2)); // 👈 logs to Netlify
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ reply: data.choices?.[0]?.message?.content || "⚠️ I couldn’t generate a response." })
+      body: JSON.stringify({
+        reply: data.choices?.[0]?.message?.content || "⚠️ OpenAI returned no response."
+      })
     };
 
   } catch (error) {
