@@ -9,7 +9,7 @@ export async function handler(event, context) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}` // ✅ Secret key stays in Netlify
+        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
       },
       body: JSON.stringify({
         model: "gpt-3.5-turbo",
@@ -26,6 +26,16 @@ export async function handler(event, context) {
     });
 
     const data = await response.json();
+
+    // ✅ Debugging output
+    console.log("OpenAI API raw response:", JSON.stringify(data, null, 2));
+
+    if (!data.choices || !data.choices[0]) {
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: "No choices returned from OpenAI", data })
+      };
+    }
 
     return {
       statusCode: 200,
